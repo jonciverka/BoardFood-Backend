@@ -27,6 +27,7 @@ controller.obtenerTableros = (req, res) => {
         conn.query(`
            SELECT 
                 CTI_TIEMPO,
+                CTI_PK_TIEMPO,
                 CTI_ORDEN,
                 TCO_COMIDA,
                 TCO_IMAGEN,
@@ -43,7 +44,8 @@ controller.obtenerTableros = (req, res) => {
             INNER JOIN C_TIEMPOS ON TUS_FK_TIEMPO = CTI_PK_TIEMPO
             LEFT JOIN T_TIEMPO_COMIDA ON CTI_PK_TIEMPO = TTC_FK_TIMEPO 
             LEFT JOIN T_COMIDA ON TTC_FK_COMIDA = TCO_PK_COMIDA  AND TCO_ESTADO = 1
-            WHERE TUS_FK_USUARIO = ?;
+            WHERE TUS_FK_USUARIO = ?
+            AND CTI_ESTADO = 1
            
             `,[ pkUsuario],
         (err, resultado)=>{
@@ -64,7 +66,7 @@ controller.actualizarTablero = (req, res) => {
         (err, resultado)=>{
             if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
             else {
-                res.status(200).json({mensaje:"Tablero creado"})
+                res.status(200).json({mensaje:"Tablero actualizado"})
             }
         }) 
     })
