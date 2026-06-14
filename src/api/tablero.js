@@ -108,6 +108,7 @@ controller.obtenerUsuarioTablero = (req, res) => {
         conn.query(`SELECT 
             TUS_USERNAME, 
             TUS_PK_USUARIO,
+            TUS_CORREO,
             TUT.TUS_PROPIETARIO
             FROM T_USUARIOS_TIEMPO AS TUT, T_USUARIOS WHERE TUT.TUS_FK_TIEMPO = ? and TUT.TUS_FK_USUARIO = TUS_PK_USUARIO`,[pkTiempo],
         (err, resultado)=>{
@@ -119,7 +120,7 @@ controller.obtenerUsuarioTablero = (req, res) => {
     })
 }
 controller.eliminarUsuarioTablero = (req, res) => {
-    var {pkTiempo, pkUsuario} = req.body
+    var {pkTiempo, pkUsuario} = req.query
     req.getConnection((err,conn)=>{
         conn.query(`DELETE FROM T_USUARIOS_TIEMPO WHERE TUS_FK_USUARIO = ? AND TUS_FK_TIEMPO = ?`,[pkUsuario, pkTiempo],
         (err, resultado)=>{
