@@ -30,7 +30,7 @@ controller.registrarUsuario = (req, res) =>{
                     }else{
                         req.getConnection((err,conn)=>{     
                             conn.query(`INSERT INTO T_USUARIOS (TUS_USERNAME, TUS_CORREO, TUS_ID_AUTH, TUS_PASSWORD)
-                            VALUES(?, ?, ?, ?)`,[username, email, idUsuario, passsword],
+                            VALUES(?, ?, ?, ?)`,[username, email, idUsuario, password],
                             (err, resultado)=>{
                                 if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
                                 else {
