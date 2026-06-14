@@ -110,7 +110,7 @@ controller.obtenerUsuarioTablero = (req, res) => {
             TUS_PK_USUARIO,
             TUS_CORREO,
             TUT.TUS_PROPIETARIO
-            FROM T_USUARIOS_TIEMPO AS TUT, T_USUARIOS WHERE TUT.TUS_FK_TIEMPO = ? and TUT.TUS_FK_USUARIO = TUS_PK_USUARIO`,[pkTiempo],
+            FROM T_USUARIOS_TIEMPO AS TUT, T_USUARIOS WHERE TUT.TUS_FK_TIEMPO = ? and TUT.TUS_FK_USUARIO = TUS_PK_USUARIO AND TUS_ESTADO = 1`,[pkTiempo],
         (err, resultado)=>{
             if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
             else {
