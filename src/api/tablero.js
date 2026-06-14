@@ -102,6 +102,18 @@ controller.agregarUsuarioTablero = (req, res) => {
         }) 
     })
 }
+controller.obtenerUsuarioTablero = (req, res) => {
+    var {pkTiempo} = req.query
+    req.getConnection((err,conn)=>{
+        conn.query(`SELECT * FROM T_USUARIOS_TIEMPO WHERE TUS_FK_TIEMPO = ?`,[pkTiempo],
+        (err, resultado)=>{
+            if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
+            else {
+                res.status(200).json({mensaje:"Usuarios obtenidos",data:resultado})
+            }
+        }) 
+    })
+}
 controller.eliminarUsuarioTablero = (req, res) => {
     var {pkTiempo, pkUsuario} = req.body
     req.getConnection((err,conn)=>{
