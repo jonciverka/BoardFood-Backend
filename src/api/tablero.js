@@ -38,7 +38,6 @@ controller.obtenerTableros = (req, res) => {
                 INNER JOIN T_USUARIOS_TIEMPO ON TUS_FK_USUARIO = TUS_PK_USUARIO 
                 WHERE TUS_FK_TIEMPO = CTI_PK_TIEMPO 
                 AND TUS_ESTADO = 1
-                LIMIT 1 
             ) AS USUARIO
             FROM T_USUARIOS_TIEMPO
             INNER JOIN C_TIEMPOS ON TUS_FK_TIEMPO = CTI_PK_TIEMPO
