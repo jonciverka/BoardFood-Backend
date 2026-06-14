@@ -25,23 +25,27 @@ controller.obtenerTableros = (req, res) => {
     var {pkUsuario} = req.query
     req.getConnection((err,conn)=>{
         conn.query(`
-            SELECT 
+           SELECT 
             CTI_TIEMPO,
             CTI_ORDEN,
             TCO_COMIDA,
             TCO_IMAGEN,
             TCO_CALIFICACION,
             TCO_NOTAS,
-            (SELECT TUS_USERNAME FROM T_USUARIOS,T_USUARIOS_TIEMPO WHERE TUS_FK_USUARIO = TUS_PK_USUARIO AND TUS_FK_TIEMPO = CTI_PK_TIEMPO AND TUS_ESTADO = 1) AS USUARIO
-            FROM 
-            T_USUARIOS_TIEMPO,
-            C_TIEMPOS, 
-            T_COMIDA
-            LEFT JOIN T_TIEMPO_COMIDA ON TTC_FK_TIMEPO = CTI_PK_TIEMPO AND TTC_FK_COMIDA = TCO_PK_COMIDA AND TCO_ESTADO = 1
-            WHERE
-            TUS_FK_USUARIO = ?
-            AND TUS_FK_TIEMPO = CTI_PK_TIEMPO
-            AND TCO_ESTADO = 1
+            (
+                SELECT TUS_USERNAME 
+                FROM T_USUARIOS
+                INNER JOIN T_USUARIOS_TIEMPO ON TUS_FK_USUARIO = TUS_PK_USUARIO 
+                WHERE TUS_FK_TIEMPO = CTI_PK_TIEMPO 
+                AND TUS_ESTADO = 1
+                LIMIT 1 
+            ) AS USUARIO
+            FROM T_USUARIOS_TIEMPO
+            INNER JOIN C_TIEMPOS ON TUS_FK_TIEMPO = CTI_PK_TIEMPO
+            CROSS JOIN T_COMIDA 
+            LEFT JOIN T_TIEMPO_COMIDA ON TTC_FK_TIEMPO = CTI_PK_TIEMPO AND TTC_FK_COMIDA = TCO_PK_COMIDA
+            WHERE TUS_FK_USUARIO = ?
+            AND TCO_ESTADO = 1;
             `,[ pkUsuario],
         (err, resultado)=>{
             if(err) {
