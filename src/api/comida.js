@@ -57,7 +57,7 @@ controller.obtenerComidas = (req, res) => {
 }
 controller.actualizarComida = (req, res) => {
     var {pkComida, nombre, imagen, calificacion, notas, pksTiempo} = req.body
-    var pksTiempo = pksTiempo.split(",")
+    var pksTiempo = pksTiempo?.split(",") ?? [];
     var date = new Date().getTime().toString();
     var nameImage = null;
     if(imagen!=null && imagen != ''){
