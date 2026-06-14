@@ -40,12 +40,11 @@ controller.obtenerTableros = (req, res) => {
                     WHERE TUS_FK_TIEMPO = CTI_PK_TIEMPO 
                     AND TUS_ESTADO = 1
                 ) AS USUARIOS 
-            FROM T_USUARIOS_TIEMPO
-            INNER JOIN C_TIEMPOS ON TUS_FK_TIEMPO = CTI_PK_TIEMPO
+            FROM T_USUARIOS_TIEMPO 
+            INNER JOIN C_TIEMPOS ON TUS_FK_TIEMPO = CTI_PK_TIEMPO AND CTI_ESTADO = 1
             LEFT JOIN T_TIEMPO_COMIDA ON CTI_PK_TIEMPO = TTC_FK_TIMEPO 
             LEFT JOIN T_COMIDA ON TTC_FK_COMIDA = TCO_PK_COMIDA  AND TCO_ESTADO = 1
             WHERE TUS_FK_USUARIO = ?
-            AND CTI_ESTADO = 1
            
             `,[ pkUsuario],
         (err, resultado)=>{
