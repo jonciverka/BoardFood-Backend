@@ -126,7 +126,7 @@ controller.eliminarUsuarioTablero = (req, res) => {
         (err, resultado)=>{
             if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
             else {
-                res.status(200).json({mensaje:"Tablero creado"})
+                res.status(200).json({mensaje:" Usuario eliminado del tablero"})
             }
         }) 
     })
@@ -138,13 +138,13 @@ controller.guardarComidaTablero = (req, res) => {
         (err, resultado)=>{
             if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
             else {
-                res.status(200).json({mensaje:"Tablero creado"})
+                res.status(200).json({mensaje:"Comida agregada al tablero"})
             }
         }) 
     })
 }
 controller.eliminarComidaTablero = (req, res) => {
-    var {pkTiempo, pkComida} = req.body
+    var {pkTiempo, pkComida} = req.query
     req.getConnection((err,conn)=>{
         conn.query(`DELETE FROM T_TIEMPO_COMIDA WHERE TTC_FK_TIMEPO = ? AND TTC_FK_COMIDA = ?`,[pkTiempo, pkComida],
         (err, resultado)=>{
