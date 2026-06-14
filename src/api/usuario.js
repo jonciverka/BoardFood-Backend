@@ -9,7 +9,7 @@ const mysql = require('mysql2/promise'); // O el cliente que estés usando
 
 const controller = {}
 controller.registrarUsuario = (req, res) =>{
-    var {email, username, passsword, idUsuario} = req.body 
+    var {email, username, password, idUsuario} = req.body 
     var date = new Date().getTime().toString();
     if(email==''||username==''||password==''||email==''){
         res.status(400).json({mensaje:"Todos los datos son obligatorios"})
