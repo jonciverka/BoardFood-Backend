@@ -71,7 +71,7 @@ controller.actualizarTablero = (req, res) => {
     })
 }
 controller.eliminarTablero = (req, res) => {
-    var {pkTiempo} = req.body
+    var {pkTiempo} = req.query
     req.getConnection((err,conn)=>{
         conn.query(`UPDATE C_TIEMPOS SET CTI_ESTADO = 0 WHERE CTI_PK_TIEMPO = ?`, [pkTiempo],
         (err, resultado)=>{
