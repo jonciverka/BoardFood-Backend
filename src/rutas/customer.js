@@ -2,6 +2,7 @@ const {Router} =  require('express')
 const router = Router();
 const usuarios = require('../api/usuario.js')
 const comida = require('../api/comida.js')
+const tablero = require('../api/tablero.js')
 
 //----------------------acceso------------------
 //Registro 
@@ -29,17 +30,21 @@ router.delete('/api/comida',comida.eliminarComida)
 //GENERAR COMIDA ALEATORIA
 //----------------------TABLERO TIEMPOS------------------
 //CREAR TABLERO TIEMPOS
-router.post('/api/tablero',comida.crearTablero)
-//OBTENER TABLERO TIEMPOS
-router.get('/api/tablero',comida.obtenerTablero)
+router.post('/api/tablero',tablero.crearTablero)
+//OBTENER TABLEROs TIEMPOS
+router.get('/api/tableros',tablero.obtenerTableros)
 //ACTUALIZAR TABLERO TIEMPOS                    
-router.put('/api/tablero',comida.actualizarTablero)         
+router.put('/api/tablero',tablero.actualizarTablero)         
 //ELIMINAR TABLERO TIEMPOS
-router.delete('/api/tablero',comida.eliminarTablero)
+router.delete('/api/tablero',tablero.eliminarTablero)
 //AGREGAR USUARIO A TABLERO TIEMPOS
+router.post('/api/usuarioTablero',tablero.agregarUsuarioTablero)
 //ELIMINAR USUARIO A TABLERO TIEMPOS
-//GUARDAR COMUDA EN TABLERO 
+router.delete('/api/usuarioTablero',tablero.eliminarUsuarioTablero)
+//GUARDAR comida EN TABLERO 
+router.post('/api/comidaTablero',tablero.guardarComidaTablero)
 //Eiminar comida en tablero
+router.delete('/api/comidaTablero',tablero.eliminarComidaTablero)
 
 
 
