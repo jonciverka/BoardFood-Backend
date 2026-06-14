@@ -91,7 +91,7 @@ controller.actualizarComida = (req, res) => {
     })
 }
 controller.eliminarComida = (req, res) => {
-    var {pkComida} = req.body
+    var {pkComida} = req.query
     req.getConnection((err,conn)=>{
         conn.query(`UPDATE T_COMIDA SET TCO_ESTADO = 0 WHERE TCO_PK_COMIDA = ?`,[pkComida],
         (err, resultado)=>{
