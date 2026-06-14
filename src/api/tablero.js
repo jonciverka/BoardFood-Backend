@@ -45,7 +45,7 @@ controller.obtenerTableros = (req, res) => {
             LEFT JOIN T_TIEMPO_COMIDA ON CTI_PK_TIEMPO = TTC_FK_TIMEPO 
             LEFT JOIN T_COMIDA ON TTC_FK_COMIDA = TCO_PK_COMIDA  AND TCO_ESTADO = 1
             WHERE TUS_FK_USUARIO = ?
-            GROUP BY CCTI_TIEMPO,
+            GROUP BY CTI_TIEMPO,
                 CTI_PK_TIEMPO,
                 CTI_ORDEN,
                 TCO_COMIDA,
