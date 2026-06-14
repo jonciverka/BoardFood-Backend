@@ -44,7 +44,7 @@ controller.crearComida = (req, res) =>{
     })
 }
 controller.obtenerComidas = (req, res) => {
-    var {pkUsuario} = req.body
+    var {pkUsuario} = req.query
     req.getConnection((err,conn)=>{
         conn.query(`SELECT * FROM T_COMIDA WHERE TCO_FK_USUARIO = ? AND TCO_ESTADO = 1`,[pkUsuario],
         (err, resultado)=>{
