@@ -11,7 +11,7 @@ const controller = {}
 
 controller.crearComida = (req, res) =>{
     var {nombre, imagen, pkUsuario, calificacion, notas, pksTiempo} = req.body
-    var pksTiempo = pksTiempo?.split(",")
+    var pksTiempo = pksTiempo?.split(",") ?? [];
     var date = new Date().getTime().toString();
     var nameImage = null;
     if(imagen!=null && imagen != ''){
