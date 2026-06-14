@@ -26,19 +26,19 @@ controller.obtenerTableros = (req, res) => {
     req.getConnection((err,conn)=>{
         conn.query(`
            SELECT 
-            CTI_TIEMPO,
-            CTI_ORDEN,
-            TCO_COMIDA,
-            TCO_IMAGEN,
-            TCO_CALIFICACION,
-            TCO_NOTAS,
-            (
-                SELECT TUS_USERNAME 
-                FROM T_USUARIOS
-                INNER JOIN T_USUARIOS_TIEMPO ON TUS_FK_USUARIO = TUS_PK_USUARIO 
-                WHERE TUS_FK_TIEMPO = CTI_PK_TIEMPO 
-                AND TUS_ESTADO = 1
-            ) AS USUARIO
+                CTI_TIEMPO,
+                CTI_ORDEN,
+                TCO_COMIDA,
+                TCO_IMAGEN,
+                TCO_CALIFICACION,
+                TCO_NOTAS,
+                (
+                    SELECT GROUP_CONCAT(TUS_USERNAME SEPARATOR ', ') 
+                    FROM T_USUARIOS
+                    INNER JOIN T_USUARIOS_TIEMPO ON TUS_FK_USUARIO = TUS_PK_USUARIO 
+                    WHERE TUS_FK_TIEMPO = CTI_PK_TIEMPO 
+                    AND TUS_ESTADO = 1
+                ) AS USUARIOS 
             FROM T_USUARIOS_TIEMPO
             INNER JOIN C_TIEMPOS ON TUS_FK_TIEMPO = CTI_PK_TIEMPO
             CROSS JOIN T_COMIDA 
