@@ -105,7 +105,10 @@ controller.agregarUsuarioTablero = (req, res) => {
 controller.obtenerUsuarioTablero = (req, res) => {
     var {pkTiempo} = req.query
     req.getConnection((err,conn)=>{
-        conn.query(`SELECT * FROM T_USUARIOS_TIEMPO WHERE TUS_FK_TIEMPO = ?`,[pkTiempo],
+        conn.query(`SELECT 
+            TUS_USERNAME, 
+            TUS_PK_USUARIO
+            FROM T_USUARIOS_TIEMPO, T_USUARIOS WHERE TUS_FK_TIEMPO = ? and TUS_FK_USUARIO = TUS_PK_USUARIO`,[pkTiempo],
         (err, resultado)=>{
             if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
             else {
