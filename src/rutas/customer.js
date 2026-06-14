@@ -16,26 +16,33 @@ router.delete('/api/usuario',usuarios.eliminarUsuario)
 //CREAR COMIDA
 router.post('/api/comida',comida.crearComida)
 //OBTENER COMIDAS
-router.get('/api/comida',comida.obtenerComidas)
+router.get('/api/comida',comida.obtenerComida)
+//OBTENER COMIDA
+router.get('/api/comidas',comida.obtenerComidas)
 //ACTUALIZAR COMIDA
 router.put('/api/comida',comida.actualizarComida)
 //ELIMINAR COMIDA
 router.delete('/api/comida',comida.eliminarComida)
 
-//GUARDAR COMUDA EN TABLERO 
-//ELIMINAR COMIDA EN TABLERO 
+
 //GENERAR SEMANA DE COMIDA
+//GENERAR COMIDA ALEATORIA
 //----------------------TABLERO TIEMPOS------------------
-//OBTENER TABLERO TIEMPOS
 //CREAR TABLERO TIEMPOS
-//ACTUALIZAR TABLERO TIEMPOS                             
+router.post('/api/tablero',comida.crearTablero)
+//OBTENER TABLERO TIEMPOS
+router.get('/api/tablero',comida.obtenerTablero)
+//ACTUALIZAR TABLERO TIEMPOS                    
+router.put('/api/tablero',comida.actualizarTablero)         
 //ELIMINAR TABLERO TIEMPOS
+router.delete('/api/tablero',comida.eliminarTablero)
 //AGREGAR USUARIO A TABLERO TIEMPOS
 //ELIMINAR USUARIO A TABLERO TIEMPOS
+//GUARDAR COMUDA EN TABLERO 
+//Eiminar comida en tablero
 
 
 
-//
 
 //----------------------CATALOGOS------------------
 // router.get('/api/obtenerCategorias',catalogos.obtenerCategorias)

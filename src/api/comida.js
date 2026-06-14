@@ -55,6 +55,18 @@ controller.obtenerComidas = (req, res) => {
         }) 
     })
 }
+controller.obtenerComida = (req, res) => {
+    var { pkComida} = req.query
+    req.getConnection((err,conn)=>{
+        conn.query(` SELECT * FROM T_COMIDA WHERE TCO_PK_COMIDA = ?`,[pkComida],
+        (err, resultado)=>{
+            if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
+            else {
+                res.status(200).json({mensaje:"Comidas obtenidas",data:resultado})
+            }
+        }) 
+    })
+}
 controller.actualizarComida = (req, res) => {
     var {pkComida, nombre, imagen, calificacion, notas, pksTiempo} = req.body
     var pksTiempo = pksTiempo?.split(",") ?? [];
