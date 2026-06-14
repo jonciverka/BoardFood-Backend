@@ -39,6 +39,8 @@ router.put('/api/tablero',tablero.actualizarTablero)
 router.delete('/api/tablero',tablero.eliminarTablero)
 //AGREGAR USUARIO A TABLERO TIEMPOS
 router.post('/api/usuarioTablero',tablero.agregarUsuarioTablero)
+//OBTENER USUARIO A TABLERO TIEMPOS
+router.get('/api/usuarioTablero',tablero.obtenerUsuarioTablero)
 //ELIMINAR USUARIO A TABLERO TIEMPOS
 router.delete('/api/usuarioTablero',tablero.eliminarUsuarioTablero)
 //GUARDAR comida EN TABLERO 
