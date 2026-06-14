@@ -1,6 +1,7 @@
 const {Router} =  require('express')
 const router = Router();
 const usuarios = require('../api/usuario.js')
+const comida = require('../api/comida.js')
 
 //----------------------acceso------------------
 //Registro 
@@ -12,17 +13,22 @@ router.get('/api/usuario',usuarios.obtenerUsuario)
 //eliminar usuarios
 router.delete('/api/usuario',usuarios.eliminarUsuario)
 //----------------------COMIDA------------------
-//OBTENER COMIDA
 //CREAR COMIDA
+router.post('/api/comida',comida.crearComida)
+//OBTENER COMIDAS
+router.get('/api/comida',comida.obtenerComidas)
 //ACTUALIZAR COMIDA
+router.put('/api/comida',comida.actualizarComida)
 //ELIMINAR COMIDA
+router.delete('/api/comida',comida.eliminarComida)
+
 //GUARDAR COMUDA EN TABLERO 
 //ELIMINAR COMIDA EN TABLERO 
 //GENERAR SEMANA DE COMIDA
 //----------------------TABLERO TIEMPOS------------------
 //OBTENER TABLERO TIEMPOS
 //CREAR TABLERO TIEMPOS
-//ACTUALIZAR TABLERO TIEMPOS
+//ACTUALIZAR TABLERO TIEMPOS                             
 //ELIMINAR TABLERO TIEMPOS
 //AGREGAR USUARIO A TABLERO TIEMPOS
 //ELIMINAR USUARIO A TABLERO TIEMPOS
