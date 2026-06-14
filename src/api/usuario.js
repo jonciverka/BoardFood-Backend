@@ -20,7 +20,7 @@ controller.registrarUsuario = (req, res) =>{
     }
     else{
         req.getConnection((err,conn)=>{     
-            conn.query(`SELECT TUS_PK_USUARIO AS PK FROM T_USUARIOS WHERE TUS_CORREO = ?`,
+            conn.query(`SELECT TUS_PK_USUARIO AS PK FROM T_USUARIOS WHERE TUS_CORREO = ? AND TUS_ESTADO = 1`,
             [email],
             (err, resultado)=>{
                 if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
