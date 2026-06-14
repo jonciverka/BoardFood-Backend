@@ -43,7 +43,10 @@ controller.obtenerTableros = (req, res) => {
             AND TCO_ESTADO = 1
             `,[ pkUsuario],
         (err, resultado)=>{
-            if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
+            if(err) {
+                console.log(err)
+                res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
+            }
             else {
                 res.status(200).json({mensaje:"Tableros obtenidos",data:resultado})
             }
