@@ -29,10 +29,12 @@ controller.obtenerTableros = (req, res) => {
                 CTI_TIEMPO,
                 CTI_PK_TIEMPO,
                 CTI_ORDEN,
+                TCO_PK_COMIDA,
                 TCO_COMIDA,
                 TCO_IMAGEN,
                 TCO_CALIFICACION,
                 TCO_NOTAS,
+                TTC_DIA,
                 (
                     SELECT GROUP_CONCAT(TUS_USERNAME SEPARATOR ', ') 
                     FROM T_USUARIOS
@@ -43,17 +45,17 @@ controller.obtenerTableros = (req, res) => {
             FROM T_USUARIOS_TIEMPO 
             INNER JOIN C_TIEMPOS ON TUS_FK_TIEMPO = CTI_PK_TIEMPO AND CTI_ESTADO = 1
             LEFT JOIN T_TIEMPO_COMIDA ON CTI_PK_TIEMPO = TTC_FK_TIMEPO 
-            LEFT JOIN T_COMIDA ON TTC_FK_COMIDA = TCO_PK_COMIDA  AND TCO_ESTADO = 1
+            LEFT JOIN T_COMIDA ON TTC_FK_COMIDA = TCO_PK_COMIDA AND TCO_ESTADO = 1
             WHERE TUS_FK_USUARIO = ?
             GROUP BY CTI_TIEMPO,
                 CTI_PK_TIEMPO,
                 CTI_ORDEN,
+                TCO_PK_COMIDA,
                 TCO_COMIDA,
                 TCO_IMAGEN,
                 TCO_CALIFICACION,
                 TCO_NOTAS,
-                USUARIOS
-           
+                TTC_DIA
             `, [pkUsuario],
             (err, resultado) => {
                 if (err) {
