@@ -25,7 +25,7 @@ controller.obtenerTableros = (req, res) => {
     var { pkUsuario } = req.query
     req.getConnection((err, conn) => {
         conn.query(`
-           SELECT 
+            SELECT 
                 CTI_TIEMPO,
                 CTI_PK_TIEMPO,
                 CTI_ORDEN,
@@ -35,7 +35,7 @@ controller.obtenerTableros = (req, res) => {
                 TCO_CALIFICACION,
                 TCO_NOTAS,
                 TTC_DIA,
-                (
+				(
                     SELECT GROUP_CONCAT(TUS_USERNAME SEPARATOR ', ') 
                     FROM T_USUARIOS
                     INNER JOIN T_USUARIOS_TIEMPO ON TUS_FK_USUARIO = TUS_PK_USUARIO 
@@ -46,6 +46,7 @@ controller.obtenerTableros = (req, res) => {
             INNER JOIN C_TIEMPOS ON TUS_FK_TIEMPO = CTI_PK_TIEMPO AND CTI_ESTADO = 1
             LEFT JOIN T_TIEMPO_COMIDA ON CTI_PK_TIEMPO = TTC_FK_TIMEPO 
             LEFT JOIN T_COMIDA ON TTC_FK_COMIDA = TCO_PK_COMIDA AND TCO_ESTADO = 1
+            INNER JOIN T_USUARIOS ON TUS_FK_USUARIO = TUS_PK_USUARIO
             WHERE TUS_FK_USUARIO = ?
             GROUP BY CTI_TIEMPO,
                 CTI_PK_TIEMPO,
@@ -56,6 +57,7 @@ controller.obtenerTableros = (req, res) => {
                 TCO_CALIFICACION,
                 TCO_NOTAS,
                 TTC_DIA
+                
             `, [pkUsuario],
             (err, resultado) => {
                 if (err) {
