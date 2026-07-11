@@ -11,7 +11,7 @@ const controller = {}
 controller.crearTablero = (req, res) => {
     var { nombre, pkUsuario } = req.body
     req.getConnection((err, conn) => {
-        conn.query(` INSERT INTO C_TIEMPOS (CTI_TIEMPO) VALUES(?)`, [nombre],
+        conn.query(` INSERT INTO C_TIEMPOS (CTI_TIEMPO, CTI_ESTADO) VALUES(?, 1)`, [nombre],
             (err, resultado) => {
                 if (err) res.status(400).json({ mensaje: "Hubo un error en el sistema, favor de intentarlo más tarde" })
                 else {
