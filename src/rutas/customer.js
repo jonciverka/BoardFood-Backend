@@ -49,11 +49,6 @@ router.post('/api/comidaTablero',tablero.guardarComidaTablero)
 router.delete('/api/comidaTablero',tablero.eliminarComidaTablero)
 
 
-
-
-//----------------------CATALOGOS------------------
-// router.get('/api/obtenerCategorias',catalogos.obtenerCategorias)
-
 router.get('*', function(req, res) {    
         res.status(404).json({mensaje:"Error 404", estado: false})
 })
