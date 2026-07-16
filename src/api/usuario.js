@@ -47,25 +47,42 @@ controller.registrarUsuario = (req, res) =>{
     }
 }
 controller.login = (req, res) =>{
-    var {email, pass} = req.body 
-    if(email==null || email == ''){
-        res.status(400).json({mensaje:"Todos los datos son obligatorios"})
-    }else if(pass==null || pass == ''){
-        res.status(400).json({mensaje:"Todos los datos son obligatorios"})
-    }else{
+    var {email, pass, id_auth, idAuth} = req.body 
+    var authId = id_auth || idAuth;
+    if(authId != null && authId != ''){
         req.getConnection((err,conn)=>{     
-            conn.query(`SELECT * FROM T_USUARIOS WHERE TUS_CORREO = ? AND TUS_PASSWORD = ? AND TUS_ESTADO = 1`,[email,pass],
+            conn.query(`SELECT * FROM T_USUARIOS WHERE TUS_ID_AUTH = ? AND TUS_ESTADO = 1`,[authId],
             (err, resultado)=>{
                 if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
                 else {
                     if(resultado.length>0){
                         res.status(200).json({mensaje:"Credenciales correctas"})
                     }else{
-                        res.status(400).json({mensaje:"El nombre de usuario y la contraseña introducidos no existen en nuestra aplicación. Comprueba tus credenciales e inténtalo de nuevo."})
+                        res.status(400).json({mensaje:"El ID de autenticación introducido no existe en nuestra aplicación. Comprueba tus credenciales e inténtalo de nuevo."})
                     }
                 }
             }) 
-        })         
+        })
+    } else {
+        if(email==null || email == ''){
+            res.status(400).json({mensaje:"Todos los datos son obligatorios"})
+        }else if(pass==null || pass == ''){
+            res.status(400).json({mensaje:"Todos los datos son obligatorios"})
+        }else{
+            req.getConnection((err,conn)=>{     
+                conn.query(`SELECT * FROM T_USUARIOS WHERE TUS_CORREO = ? AND TUS_PASSWORD = ? AND TUS_ESTADO = 1`,[email,pass],
+                (err, resultado)=>{
+                    if(err) res.status(400).json({mensaje:"Hubo un error en el sistema, favor de intentarlo más tarde"})
+                    else {
+                        if(resultado.length>0){
+                            res.status(200).json({mensaje:"Credenciales correctas"})
+                        }else{
+                            res.status(400).json({mensaje:"El nombre de usuario y la contraseña introducidos no existen en nuestra aplicación. Comprueba tus credenciales e inténtalo de nuevo."})
+                        }
+                    }
+                }) 
+            })         
+        }
     }
 }
 controller.obtenerUsuario = (req, res) => {
