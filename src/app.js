@@ -51,6 +51,7 @@ app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 // static files
  app.use(express.static(__dirname + '/views'))
+ app.use('/recursos', express.static(path.join(__dirname, '../../boardFoodImage')))
 //rutas
 app.use("/", customerRutas)
 

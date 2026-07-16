@@ -16,7 +16,7 @@ controller.crearComida = (req, res) =>{
     var nameImage = null;
     if(imagen!=null && imagen != ''){
         nameImage = date+".jpg"; 
-        var realFile = Buffer.from(foto,"base64");
+        var realFile = Buffer.from(imagen,"base64");
         fs.writeFile('./../../boardFoodImage/'+nameImage, realFile, function(err) {
             if(err){
                 console.log(err);
@@ -74,7 +74,7 @@ controller.actualizarComida = (req, res) => {
     var nameImage = null;
     if(imagen!=null && imagen != ''){
         nameImage = date+".jpg"; 
-        var realFile = Buffer.from(foto,"base64");
+        var realFile = Buffer.from(imagen,"base64");
         fs.writeFile('./../../boardFoodImage/'+nameImage, realFile, function(err) {
             if(err){
                 console.log(err);
