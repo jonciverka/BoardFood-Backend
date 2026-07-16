@@ -17,7 +17,7 @@ controller.crearComida = (req, res) =>{
     if(imagen!=null && imagen != ''){
         nameImage = date+".jpg"; 
         var realFile = Buffer.from(imagen,"base64");
-        fs.writeFile('./../../boardFoodImage/'+nameImage, realFile, function(err) {
+        fs.writeFile(path.join(__dirname, '../../../boardFoodImage', nameImage), realFile, function(err) {
             if(err){
                 console.log(err);
                 res.status(400).json({mensaje:"There was a system error, please try again later.",estado: false})
@@ -75,7 +75,7 @@ controller.actualizarComida = (req, res) => {
     if(imagen!=null && imagen != ''){
         nameImage = date+".jpg"; 
         var realFile = Buffer.from(imagen,"base64");
-        fs.writeFile('./../../boardFoodImage/'+nameImage, realFile, function(err) {
+        fs.writeFile(path.join(__dirname, '../../../boardFoodImage', nameImage), realFile, function(err) {
             if(err){
                 console.log(err);
                 res.status(400).json({mensaje:"There was a system error, please try again later.",estado: false})
