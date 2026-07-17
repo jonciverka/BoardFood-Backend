@@ -35,6 +35,7 @@ controller.obtenerTableros = (req, res) => {
                 TCO_CALIFICACION,
                 TCO_NOTAS,
                 TTC_DIA,
+                TUS_PROPIETARIO AS PROPIETARIO,
 				(
                     SELECT GROUP_CONCAT(TUS_USERNAME SEPARATOR ', ') 
                     FROM T_USUARIOS
@@ -56,7 +57,8 @@ controller.obtenerTableros = (req, res) => {
                 TCO_IMAGEN,
                 TCO_CALIFICACION,
                 TCO_NOTAS,
-                TTC_DIA
+                TTC_DIA,
+                TUS_PROPIETARIO
                 
             `, [pkUsuario],
             (err, resultado) => {
