@@ -84,7 +84,7 @@ controller.actualizarComida = (req, res) => {
         });
     }
     req.getConnection((err, conn) => {
-        conn.query(`UPDATE T_COMIDA SET TCO_COMIDA = ?, TCO_IMAGEN = ?, TCO_CALIFICACION = ?, TCO_NOTAS = ? WHERE TCO_PK_COMIDA = ?`,
+        conn.query(`UPDATE T_COMIDA SET TCO_COMIDA = ?, TCO_IMAGEN = COALESCE(?, TCO_IMAGEN), TCO_CALIFICACION = ?, TCO_NOTAS = ? WHERE TCO_PK_COMIDA = ?`,
             [nombre, nameImage, calificacion, notas, pkComida],
             (err, resultado) => {
                 if (err) res.status(400).json({ mensaje: "Hubo un error en el sistema, favor de intentarlo más tarde" })
