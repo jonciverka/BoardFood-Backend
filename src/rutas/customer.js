@@ -24,6 +24,8 @@ router.get('/api/comidas', comida.obtenerComidas)
 router.put('/api/comida', comida.actualizarComida)
 //ELIMINAR COMIDA
 router.delete('/api/comida', comida.eliminarComida)
+//COPIAR COMIDAS A OTRO USUARIO
+router.post('/api/comidas/copiar', comida.copiarComidas)
 
 
 //GENERAR SEMANA DE COMIDA
