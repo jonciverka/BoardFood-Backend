@@ -26,6 +26,12 @@ router.put('/api/comida', comida.actualizarComida)
 router.delete('/api/comida', comida.eliminarComida)
 //COPIAR COMIDAS A OTRO USUARIO
 router.post('/api/comidas/copiar', comida.copiarComidas)
+//ENVIAR INVITACION DE COMIDAS POR CORREO
+router.post('/api/comidas/invitacion', comida.crearInvitacionComida)
+//OBTENER INVITACIONES PENDIENTES
+router.get('/api/comidas/invitacionesPendientes', comida.obtenerInvitacionesPendientes)
+//RESPONDER INVITACION DE COMIDAS
+router.post('/api/comidas/responderInvitacion', comida.responderInvitacionComida)
 
 
 //GENERAR SEMANA DE COMIDA

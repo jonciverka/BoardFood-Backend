@@ -198,4 +198,156 @@ controller.copiarComidas = (req, res) => {
         })();
     });
 }
+
+controller.crearInvitacionComida = (req, res) => {
+    var { pksComidas, emailDestino, pkUsuarioOrigen } = req.body;
+
+    let pksStr = "";
+    if (Array.isArray(pksComidas)) {
+        pksStr = pksComidas.join(',');
+    } else if (typeof pksComidas === 'string') {
+        pksStr = pksComidas.trim();
+    }
+
+    if (!pksStr || !emailDestino || !pkUsuarioOrigen) {
+        return res.status(400).json({ mensaje: "Faltan parámetros requeridos (pksComidas, emailDestino, pkUsuarioOrigen)", estado: false });
+    }
+
+    req.getConnection((err, conn) => {
+        if (err) return res.status(400).json({ mensaje: "Error en la conexión a la base de datos", estado: false });
+
+        conn.query(`SELECT TUS_PK_USUARIO FROM T_USUARIOS WHERE TUS_CORREO = ? AND TUS_ESTADO = 1`, [emailDestino.trim()], (err, users) => {
+            if (err) return res.status(400).json({ mensaje: "Error al consultar usuario destino", estado: false });
+            if (!users || users.length === 0) {
+                return res.status(404).json({ mensaje: `No existe ningún usuario registrado con el correo ${emailDestino}`, estado: false });
+            }
+
+            const targetUserId = users[0].TUS_PK_USUARIO;
+
+            conn.query(
+                `INSERT INTO T_INVITACION_COMIDA (ICO_FK_USUARIO_ORIGEN, ICO_FK_USUARIO_DESTINO, ICO_PKS_COMIDAS, ICO_ESTADO) VALUES (?, ?, ?, 0)`,
+                [pkUsuarioOrigen, targetUserId, pksStr],
+                (err, resultado) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(400).json({ mensaje: "Error al enviar la invitación de comidas", estado: false });
+                    }
+                    res.status(200).json({ mensaje: `Invitación enviada exitosamente a ${emailDestino}`, estado: true });
+                }
+            );
+        });
+    });
+};
+
+controller.obtenerInvitacionesPendientes = (req, res) => {
+    var { pkUsuario } = req.query;
+
+    if (!pkUsuario) {
+        return res.status(400).json({ mensaje: "Falta el parámetro pkUsuario", estado: false });
+    }
+
+    req.getConnection((err, conn) => {
+        if (err) return res.status(400).json({ mensaje: "Error en la conexión a la base de datos", estado: false });
+
+        const sql = `
+            SELECT 
+                I.ICO_PK_INVITACION,
+                I.ICO_FK_USUARIO_ORIGEN,
+                I.ICO_FK_USUARIO_DESTINO,
+                I.ICO_PKS_COMIDAS,
+                I.ICO_FECHA,
+                U.TUS_USERNAME AS USERNAME_ORIGEN,
+                U.TUS_CORREO AS CORREO_ORIGEN
+            FROM T_INVITACION_COMIDA I
+            INNER JOIN T_USUARIOS U ON I.ICO_FK_USUARIO_ORIGEN = U.TUS_PK_USUARIO
+            WHERE I.ICO_FK_USUARIO_DESTINO = ? AND I.ICO_ESTADO = 0
+            ORDER BY I.ICO_FECHA DESC
+        `;
+
+        conn.query(sql, [pkUsuario], (err, invitaciones) => {
+            if (err) return res.status(400).json({ mensaje: "Error al obtener invitaciones pendientes", estado: false });
+            res.status(200).json({ mensaje: "Invitaciones pendientes obtenidas", data: invitaciones, estado: true });
+        });
+    });
+};
+
+controller.responderInvitacionComida = (req, res) => {
+    var { pkInvitacion, aceptar } = req.body;
+
+    if (!pkInvitacion) {
+        return res.status(400).json({ mensaje: "Falta el parámetro pkInvitacion", estado: false });
+    }
+
+    req.getConnection((err, conn) => {
+        if (err) return res.status(400).json({ mensaje: "Error en la conexión a la base de datos", estado: false });
+
+        const queryAsync = (sql, params) => {
+            return new Promise((resolve, reject) => {
+                conn.query(sql, params, (err, results) => {
+                    if (err) return reject(err);
+                    resolve(results);
+                });
+            });
+        };
+
+        (async () => {
+            try {
+                const invs = await queryAsync(`SELECT * FROM T_INVITACION_COMIDA WHERE ICO_PK_INVITACION = ? AND ICO_ESTADO = 0`, [pkInvitacion]);
+                if (!invs || invs.length === 0) {
+                    return res.status(404).json({ mensaje: "Invitación no encontrada o ya procesada", estado: false });
+                }
+
+                const inv = invs[0];
+                const shouldAccept = aceptar === true || aceptar === 1 || aceptar === 'true';
+
+                if (!shouldAccept) {
+                    await queryAsync(`UPDATE T_INVITACION_COMIDA SET ICO_ESTADO = 2 WHERE ICO_PK_INVITACION = ?`, [pkInvitacion]);
+                    return res.status(200).json({ mensaje: "Invitación rechazada", estado: true });
+                }
+
+                // Si se acepta, copiar las comidas al usuario destino
+                const targetUserId = inv.ICO_FK_USUARIO_DESTINO;
+                let pksComidas = inv.ICO_PKS_COMIDAS.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+
+                if (pksComidas.length > 0) {
+                    const comidas = await queryAsync(
+                        `SELECT * FROM T_COMIDA WHERE TCO_PK_COMIDA IN (?) AND TCO_ESTADO = 1`,
+                        [pksComidas]
+                    );
+
+                    for (const comida of comidas) {
+                        const resultInsert = await queryAsync(
+                            `INSERT INTO T_COMIDA (TCO_COMIDA, TCO_IMAGEN, TCO_FK_USUARIO, TCO_CALIFICACION, TCO_NOTAS) VALUES (?, ?, ?, NULL, ?)`,
+                            [comida.TCO_COMIDA, comida.TCO_IMAGEN, targetUserId, comida.TCO_NOTAS]
+                        );
+
+                        const nuevaPkComida = resultInsert.insertId;
+
+                        const tiempos = await queryAsync(
+                            `SELECT TTH_FK_TIEMPO FROM T_TIEMPO_HAS_COMIDA WHERE TTH_FK_COMIDA = ?`,
+                            [comida.TCO_PK_COMIDA]
+                        );
+
+                        if (tiempos && tiempos.length > 0) {
+                            for (const tiempo of tiempos) {
+                                await queryAsync(
+                                    `INSERT INTO T_TIEMPO_HAS_COMIDA (TTH_FK_TIEMPO, TTH_FK_COMIDA) VALUES (?, ?)`,
+                                    [tiempo.TTH_FK_TIEMPO, nuevaPkComida]
+                                );
+                            }
+                        }
+                    }
+                }
+
+                await queryAsync(`UPDATE T_INVITACION_COMIDA SET ICO_ESTADO = 1 WHERE ICO_PK_INVITACION = ?`, [pkInvitacion]);
+                res.status(200).json({ mensaje: "¡Comidas aceptadas e importadas exitosamente a tu catálogo!", estado: true });
+
+            } catch (error) {
+                console.error("Error al responder invitación:", error);
+                res.status(400).json({ mensaje: "Hubo un error en el sistema al procesar la invitación", estado: false });
+            }
+        })();
+    });
+};
+
 module.exports = controller;
