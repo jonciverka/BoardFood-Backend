@@ -37,12 +37,12 @@ app.use(cors());
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(morgan('dev'))
-app.use(myConnection(mysql,{
-    host : '51.222.30.154',
-    port: '3306',
-    user: 'jonathan',
-    password: '7I4cm5Gj7iN%',
-    database : 'BoardFood',
+app.use(myConnection(mysql, {
+    host: process.env.DB_HOST || config.DB_HOST,
+    port: process.env.DB_PORT || config.DB_PORT,
+    user: process.env.DB_USER || config.DB_USER,
+    password: process.env.DB_PASSWORD || config.DB_PASSWORD,
+    database: process.env.DB_NAME || config.DB_NAME,
     multipleStatements: true,
     charset: "utf8mb4"
 }))
@@ -51,7 +51,10 @@ app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 // static files
  app.use(express.static(__dirname + '/views'))
- app.use('/recursos', express.static(path.join(__dirname, '../../boardFoodImage')))
+ const imagenesPath = process.env.NODE_ENV === 'production' || process.env.UPLOADS_PATH
+   ? (process.env.UPLOADS_PATH || '/boardFoodImage')
+   : path.join(__dirname, '../../boardFoodImage');
+ app.use('/recursos', express.static(imagenesPath))
 //rutas
 app.use("/", customerRutas)
 
