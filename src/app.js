@@ -49,6 +49,7 @@ app.use(myConnection(mysql, {
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
+app.use(express.static(path.join(__dirname, 'views')))
 const fs = require('fs')
 const defaultDockerPath = '/boardFoodImage'
 const imagenesPath = process.env.UPLOADS_PATH ||

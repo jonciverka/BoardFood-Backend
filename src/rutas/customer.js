@@ -1,8 +1,14 @@
 const { Router } = require('express')
 const router = Router();
+const path = require('path');
 const usuarios = require('../api/usuario.js')
 const comida = require('../api/comida.js')
 const tablero = require('../api/tablero.js')
+
+// Healthcheck / Root
+router.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/index.html'));
+})
 
 //----------------------acceso------------------
 //Registro 
