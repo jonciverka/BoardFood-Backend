@@ -7,6 +7,8 @@ const urlModule = require('url');
 
 const mysql = require('mysql2/promise'); // O el cliente que estés usando
 
+const controller = {};
+
 function getUploadsDir() {
     const defaultDockerPath = '/boardFoodImage';
     if (process.env.UPLOADS_PATH) return process.env.UPLOADS_PATH;
