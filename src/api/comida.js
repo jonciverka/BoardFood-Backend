@@ -7,7 +7,12 @@ const urlModule = require('url');
 
 const mysql = require('mysql2/promise'); // O el cliente que estés usando
 
-const controller = {}
+function getUploadsDir() {
+    const defaultDockerPath = '/boardFoodImage';
+    if (process.env.UPLOADS_PATH) return process.env.UPLOADS_PATH;
+    if (fs.existsSync(defaultDockerPath)) return defaultDockerPath;
+    return path.join(__dirname, '../../../boardFoodImage');
+}
 
 controller.crearComida = (req, res) => {
     var { nombre, imagen, pkUsuario, calificacion, notas, pksTiempo } = req.body
@@ -17,7 +22,7 @@ controller.crearComida = (req, res) => {
     if (imagen != null && imagen != '') {
         nameImage = date + ".jpg";
         var realFile = Buffer.from(imagen, "base64");
-        fs.writeFile(path.join(__dirname, '../../../boardFoodImage', nameImage), realFile, function (err) {
+        fs.writeFile(path.join(getUploadsDir(), nameImage), realFile, function (err) {
             if (err) {
                 console.log(err);
                 res.status(400).json({ mensaje: "There was a system error, please try again later.", estado: false })
@@ -75,7 +80,7 @@ controller.actualizarComida = (req, res) => {
     if (imagen != null && imagen != '') {
         nameImage = date + ".jpg";
         var realFile = Buffer.from(imagen, "base64");
-        fs.writeFile(path.join(__dirname, '../../../boardFoodImage', nameImage), realFile, function (err) {
+        fs.writeFile(path.join(getUploadsDir(), nameImage), realFile, function (err) {
             if (err) {
                 console.log(err);
                 res.status(400).json({ mensaje: "There was a system error, please try again later.", estado: false })

@@ -49,11 +49,11 @@ app.use(myConnection(mysql, {
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
-// static files
-app.use(express.static(__dirname + '/views'))
-const imagenesPath = process.env.NODE_ENV === 'production' || process.env.UPLOADS_PATH
-  ? (process.env.UPLOADS_PATH || '/boardFoodImage')
-  : path.join(__dirname, '../../boardFoodImage');
+const fs = require('fs')
+const defaultDockerPath = '/boardFoodImage'
+const imagenesPath = process.env.UPLOADS_PATH ||
+  (fs.existsSync(defaultDockerPath) ? defaultDockerPath : path.join(__dirname, '../../boardFoodImage'))
+
 app.use('/recursos', express.static(imagenesPath))
 //rutas
 app.use("/", customerRutas)
