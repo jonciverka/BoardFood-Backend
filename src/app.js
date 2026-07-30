@@ -60,5 +60,17 @@ app.use("/", customerRutas)
 
 server.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
+  try {
+    const fs = require('fs');
+    const existe = fs.existsSync(imagenesPath);
+    console.log(`[RECURSOS] Ruta estática: ${imagenesPath} | ¿Existe?: ${existe}`);
+    if (existe) {
+      const archivos = fs.readdirSync(imagenesPath);
+      console.log(`[RECURSOS] Total de archivos en carpeta: ${archivos.length}`);
+      console.log(`[RECURSOS] ¿Existe 1784562390618.jpg?: ${archivos.includes('1784562390618.jpg')}`);
+    }
+  } catch (err) {
+    console.error(`[RECURSOS] Error verificando carpeta:`, err);
+  }
   console.log('Press Ctrl+C to quit.');
 })
