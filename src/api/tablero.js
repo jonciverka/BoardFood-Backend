@@ -236,66 +236,52 @@ function seleccionarComidas({ comidas, tiemposDeclarados, usosHistoricos, usadas
         return { ok: false, motivo: 'SIN_SUFICIENTES', promedio: null };
     }
 
-    // Orden preferente: no usada la semana anterior → respeta tiempo habitual →
+    // Orden preferente (dentro de cada grupo): respeta tiempo habitual →
     // sin historial (fallback) → mejor calificación.
-    const orden = (c) => [
-        c.usadoPrevio ? 0 : 1,
+    const ordenPreferente = (c) => [
         c.corresponde ? 1 : 0,
         c.sinHistorial ? 1 : 0,
         c.calificacion == null ? -1 : c.calificacion,
     ];
-    const comparar = (a, b) => {
-        const oa = orden(a), ob = orden(b);
+    const compararPreferente = (a, b) => {
+        const oa = ordenPreferente(a), ob = ordenPreferente(b);
         for (let i = 0; i < oa.length; i++) {
             if (oa[i] !== ob[i]) return ob[i] - oa[i];
         }
         return 0;
     };
 
-    let seleccion = [...candidatas].sort(comparar).slice(0, 7);
-    let promedio = calcularPromedio(seleccion);
+    // Separar candidatas según si se usaron en la semana anterior.
+    const noUsadas = candidatas.filter(c => !c.usadoPrevio);
+    const usadas = candidatas.filter(c => c.usadoPrevio);
 
-    // Si con las reglas estrictas no se alcanza 4.5, se relaja únicamente la
-    // exclusión de la semana anterior (priorizando la calificación).
-    if (promedio < 4.5) {
-        const ordenPorCalificacion = (c) => [
-            c.corresponde ? 1 : 0,
-            c.sinHistorial ? 1 : 0,
-            c.calificacion == null ? -1 : c.calificacion,
-        ];
-        const relajadas = [...candidatas].sort((a, b) => {
-            const oa = ordenPorCalificacion(a), ob = ordenPorCalificacion(b);
-            for (let i = 0; i < oa.length; i++) {
-                if (oa[i] !== ob[i]) return ob[i] - oa[i];
-            }
-            return 0;
-        }).slice(0, 7);
-        const promedioRelajado = calcularPromedio(relajadas);
-        if (promedioRelajado > promedio) {
-            seleccion = relajadas;
-            promedio = promedioRelajado;
+    // Se busca la semana que cumpla promedio >= 4.5 repitiendo la MENOR
+    // cantidad posible de comidas de la semana anterior: se prueba desde
+    // k = 0 comidas repetidas hasta k = 7, y se elige la primera k que
+    // alcanza el objetivo (las (7-k) no usadas de mejor perfil + las k
+    // usadas de mejor perfil).
+    let mejor = null;
+    const kMax = Math.min(7, usadas.length);
+    for (let k = 0; k <= kMax; k++) {
+        const n = 7 - k;
+        if (n > noUsadas.length) continue; // no hay suficientes no usadas
+        const seleccion = [...noUsadas].sort(compararPreferente).slice(0, n)
+            .concat([...usadas].sort(compararPreferente).slice(0, k));
+        const promedio = calcularPromedio(seleccion);
+        if (mejor == null) mejor = { seleccion, promedio, k };
+        if (promedio >= 4.5) {
+            mejor = { seleccion, promedio, k };
+            break; // menor repetición que cumple el objetivo
         }
     }
 
-    // Garantía final del objetivo promedio ≥ 4.5: si ni siquiera las 7 mejores
-    // calificaciones lo alcanzan, ninguna combinación podrá → error explícito
-    // (el controlador no persiste nada en ese caso).
-    if (promedio < 4.5) {
-        const mejores = [...candidatas].sort((a, b) => {
-            const ca = a.calificacion == null ? -1 : a.calificacion;
-            const cb = b.calificacion == null ? -1 : b.calificacion;
-            return cb - ca;
-        }).slice(0, 7);
-        const promedioMejores = calcularPromedio(mejores);
-        if (promedioMejores >= 4.5) {
-            seleccion = mejores;
-            promedio = promedioMejores;
-        } else {
-            return { ok: false, motivo: 'PROMEDIO_MINIMO', promedio: promedioMejores };
-        }
+    // Garantía final: si ni siquiera la mejor combinación alcanza 4.5,
+    // ninguna podrá → error explícito (el controlador no persiste nada).
+    if (mejor == null || mejor.promedio < 4.5) {
+        return { ok: false, motivo: 'PROMEDIO_MINIMO', promedio: mejor ? mejor.promedio : null };
     }
 
-    return { ok: true, seleccion, promedio };
+    return { ok: true, seleccion: mejor.seleccion, promedio: mejor.promedio };
 }
 
 /**
@@ -400,22 +386,6 @@ controller.generarSemana = (req, res) => {
                     pkTiempo: Number(pkTiempo),
                     pkPropietario,
                 });
-
-                // DBG TEMPORAL — diagnóstico exclusión semana anterior
-                console.log('DBG generarSemana', JSON.stringify({
-                    pkTiempo,
-                    fechaInicio,
-                    fechaInicioPrev,
-                    usuarios: pksUsuarios,
-                    nComidas: comidas.length,
-                    nTiemposDeclarados: tiemposDeclarados.length,
-                    nUsosHistoricos: usosHistoricos.length,
-                    nUsadasPrevias: usadasPrevias.length,
-                    usadasPrevias,
-                    seleccion: resultado.ok ? resultado.seleccion.map(c => c.pkComida) : null,
-                    promedio: resultado.ok ? resultado.promedio : null,
-                    motivo: resultado.ok ? null : resultado.motivo,
-                }));
 
                 if (!resultado.ok) {
                     if (resultado.motivo === 'SIN_SUFICIENTES') {

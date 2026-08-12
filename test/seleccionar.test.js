@@ -151,6 +151,38 @@ test('relaja la exclusión de la semana anterior si eso alcanza el promedio >= 4
     assert.ok(pks.includes(8) && pks.includes(9) && pks.includes(10), 'debe tomar las mejor calificadas de la semana anterior');
 });
 
+test('minimiza las repeticiones de la semana anterior manteniendo promedio >= 4.5 (regresión prod)', () => {
+    // Caso real detectado en producción: pool con muchas comidas, 7 usadas la
+    // semana anterior. Antes del fix la semana se repetía idéntica (7/7).
+    const comidas = [
+        // usadas la semana anterior
+        comida(27, 'A', 'a.png', PROPIETARIO, 5),
+        comida(29, 'B', 'b.png', PROPIETARIO, 5),
+        comida(34, 'C', 'c.png', PROPIETARIO, 5),
+        comida(36, 'D', 'd.png', PROPIETARIO, 5),
+        comida(41, 'E', 'e.png', PROPIETARIO, 5),
+        comida(25, 'F', 'f.png', PROPIETARIO, 4),
+        // no usadas
+        comida(31, 'G', 'g.png', PROPIETARIO, 5),
+        comida(63, 'H', 'h.png', PROPIETARIO, 5),
+        comida(26, 'I', 'i.png', PROPIETARIO, 4),
+        comida(28, 'J', 'j.png', PROPIETARIO, 4),
+        comida(30, 'K', 'k.png', PROPIETARIO, 4),
+        comida(33, 'L', 'l.png', PROPIETARIO, 4),
+        comida(39, 'M', 'm.png', PROPIETARIO, 4),
+        comida(40, 'N', 'n.png', PROPIETARIO, 4),
+    ];
+    const usadasPrevias = [27, 29, 34, 36, 41, 25];
+    const r = seleccionarComidas(baseParams(comidas, { usadasPrevias }));
+
+    assert.equal(r.ok, true);
+    assert.ok(r.promedio >= 4.5, `promedio ${r.promedio} debería ser >= 4.5`);
+    const pks = r.seleccion.map(c => c.pkComida);
+    const repetidas = pks.filter(pk => usadasPrevias.includes(pk));
+    assert.ok(repetidas.length < usadasPrevias.length,
+        `debería repetir menos de ${usadasPrevias.length} (repitió ${repetidas.length}: ${repetidas})`);
+});
+
 test('responde SIN_SUFICIENTES cuando el pool tiene menos de 7 comidas', () => {
     const comidas = [1, 2, 3, 4, 5, 6].map(pk => comida(pk, `Comida ${pk}`, undefined, PROPIETARIO, 5));
     const r = seleccionarComidas(baseParams(comidas));
