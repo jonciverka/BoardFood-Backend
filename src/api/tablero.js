@@ -421,13 +421,13 @@ controller.generarSemana = (req, res) => {
                 const rollbackTx = () => new Promise((resolve, reject) => conn.rollback(e => e ? reject(e) : resolve()));
 
                 await beginTx();
+                const data = [];
                 try {
                     await queryAsync(
                         `DELETE FROM T_TIEMPO_COMIDA WHERE TTC_FK_TIMEPO = ? AND TTC_DIA >= ? AND TTC_DIA <= ?`,
                         [pkTiempo, fechaInicio, fechaFin]
                     );
 
-                    const data = [];
                     for (let i = 0; i < 7; i++) {
                         const dia = addDays(fechaInicio, i);
                         const comida = resultado.seleccion[i];
