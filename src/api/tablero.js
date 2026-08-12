@@ -401,6 +401,22 @@ controller.generarSemana = (req, res) => {
                     pkPropietario,
                 });
 
+                // DBG TEMPORAL — diagnóstico exclusión semana anterior
+                console.log('DBG generarSemana', JSON.stringify({
+                    pkTiempo,
+                    fechaInicio,
+                    fechaInicioPrev,
+                    usuarios: pksUsuarios,
+                    nComidas: comidas.length,
+                    nTiemposDeclarados: tiemposDeclarados.length,
+                    nUsosHistoricos: usosHistoricos.length,
+                    nUsadasPrevias: usadasPrevias.length,
+                    usadasPrevias,
+                    seleccion: resultado.ok ? resultado.seleccion.map(c => c.pkComida) : null,
+                    promedio: resultado.ok ? resultado.promedio : null,
+                    motivo: resultado.ok ? null : resultado.motivo,
+                }));
+
                 if (!resultado.ok) {
                     if (resultado.motivo === 'SIN_SUFICIENTES') {
                         return res.status(400).json({ mensaje: "No hay suficientes comidas disponibles para completar la semana (se necesitan 7)", estado: false });
