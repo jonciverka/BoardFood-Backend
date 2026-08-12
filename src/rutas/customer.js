@@ -39,9 +39,6 @@ router.get('/api/comidas/invitacionesPendientes', comida.obtenerInvitacionesPend
 //RESPONDER INVITACION DE COMIDAS
 router.post('/api/comidas/responderInvitacion', comida.responderInvitacionComida)
 
-
-//GENERAR SEMANA DE COMIDA
-//GENERAR COMIDA ALEATORIA
 //----------------------TABLERO TIEMPOS------------------
 //CREAR TABLERO TIEMPOS
 router.post('/api/tablero', tablero.crearTablero)
@@ -61,6 +58,8 @@ router.delete('/api/usuarioTablero', tablero.eliminarUsuarioTablero)
 router.post('/api/comidaTablero', tablero.guardarComidaTablero)
 //Eiminar comida en tablero
 router.delete('/api/comidaTablero', tablero.eliminarComidaTablero)
+//GENERAR SEMANA DE COMIDA
+router.post('/api/comidaTablero/generar', tablero.generarSemana)
 
 
 router.get('*', function (req, res) {

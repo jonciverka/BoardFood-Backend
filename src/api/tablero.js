@@ -161,4 +161,216 @@ controller.eliminarComidaTablero = (req, res) => {
             })
     })
 }
+
+/**
+ * Genera una semana aleatoria de comidas para un tablero (tiempo de comida).
+ *
+ * Reglas:
+ * - Pool = comidas del dueño + copias de los colaboradores del tablero.
+ * - Calificación efectiva por comida = promedio de las calificaciones del
+ *   catálogo (dueño + colaboradores) de la misma comida.
+ * - Excluye comidas usadas en los 7 días previos a `fechaInicio`.
+ * - No repite comidas dentro de la semana generada.
+ * - Respeta el tiempo de comida habitual (tiempos declarados en
+ *   T_TIEMPO_HAS_COMIDA o tiempos usados históricamente en T_TIEMPO_COMIDA);
+ *   con fallback a comidas sin historial si no hay suficientes candidatas.
+ * - Prioriza comidas con mejor calificación (objetivo promedio ≥ 4.5).
+ * - Persiste (reemplaza) las 7 asignaciones de la semana objetivo.
+ */
+controller.generarSemana = (req, res) => {
+    var { pkTiempo, fechaInicio } = req.body;
+
+    if (!pkTiempo || !fechaInicio) {
+        return res.status(400).json({ mensaje: "Faltan parámetros requeridos (pkTiempo, fechaInicio)", estado: false });
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaInicio)) {
+        return res.status(400).json({ mensaje: "fechaInicio debe tener formato yyyy-MM-dd", estado: false });
+    }
+
+    req.getConnection((err, conn) => {
+        if (err) return res.status(400).json({ mensaje: "Error en la conexión a la base de datos", estado: false });
+
+        const queryAsync = (sql, params) => new Promise((resolve, reject) => {
+            conn.query(sql, params, (err, results) => err ? reject(err) : resolve(results));
+        });
+
+        const addDays = (dateStr, days) => {
+            const [y, m, d] = dateStr.split('-').map(Number);
+            const date = new Date(Date.UTC(y, m - 1, d + days));
+            return date.toISOString().slice(0, 10);
+        };
+
+        (async () => {
+            try {
+                // 1) Usuarios del tablero (dueño + colaboradores)
+                const usuariosTablero = await queryAsync(
+                    `SELECT TUS_FK_USUARIO, TUS_PROPIETARIO FROM T_USUARIOS_TIEMPO WHERE TUS_FK_TIEMPO = ?`,
+                    [pkTiempo]
+                );
+                if (!usuariosTablero || usuariosTablero.length === 0) {
+                    return res.status(404).json({ mensaje: "El tablero no existe o no tiene usuarios", estado: false });
+                }
+                const pksUsuarios = usuariosTablero.map(u => u.TUS_FK_USUARIO);
+                const pkPropietario = (usuariosTablero.find(u => u.TUS_PROPIETARIO == 1) || {}).TUS_FK_USUARIO || pksUsuarios[0];
+
+                // 2) Pool de comidas: catálogo del dueño + colaboradores
+                const comidas = await queryAsync(
+                    `SELECT TCO_PK_COMIDA, TCO_COMIDA, TCO_IMAGEN, TCO_FK_USUARIO, TCO_CALIFICACION
+                     FROM T_COMIDA
+                     WHERE TCO_FK_USUARIO IN (?) AND TCO_ESTADO = 1`,
+                    [pksUsuarios]
+                );
+
+                if (!comidas || comidas.length === 0) {
+                    return res.status(404).json({ mensaje: "No hay comidas disponibles para generar la semana", estado: false });
+                }
+
+                const pksComidas = comidas.map(c => c.TCO_PK_COMIDA);
+
+                // 3) Tiempos declarados (T_TIEMPO_HAS_COMIDA) y tiempos usados históricamente (T_TIEMPO_COMIDA)
+                const [tiemposDeclarados, usosHistoricos] = await Promise.all([
+                    queryAsync(
+                        `SELECT TTH_FK_COMIDA, TTH_FK_TIEMPO FROM T_TIEMPO_HAS_COMIDA WHERE TTH_FK_COMIDA IN (?)`,
+                        [pksComidas]
+                    ),
+                    queryAsync(
+                        `SELECT TTC_FK_COMIDA, TTC_FK_TIMEPO, COUNT(*) AS veces
+                         FROM T_TIEMPO_COMIDA
+                         WHERE TTC_FK_COMIDA IN (?)
+                         GROUP BY TTC_FK_COMIDA, TTC_FK_TIMEPO`,
+                        [pksComidas]
+                    )
+                ]);
+
+                // 4) Comidas usadas en los 7 días previos a fechaInicio (mismo tablero)
+                const fechaInicioPrev = addDays(fechaInicio, -7);
+                const usadasPrevias = await queryAsync(
+                    `SELECT DISTINCT TTC_FK_COMIDA
+                     FROM T_TIEMPO_COMIDA
+                     WHERE TTC_FK_TIMEPO = ? AND TTC_DIA >= ? AND TTC_DIA < ?`,
+                    [pkTiempo, fechaInicioPrev, fechaInicio]
+                );
+                const pksUsadasPrevias = new Set(usadasPrevias.map(r => r.TTC_FK_COMIDA));
+
+                // Agrupar copias de la misma comida (nombre + imagen) para promediar calificaciones
+                const grupos = new Map();
+                for (const comida of comidas) {
+                    const key = `${(comida.TCO_COMIDA || '').trim().toLowerCase()}|${comida.TCO_IMAGEN || ''}`;
+                    if (!grupos.has(key)) grupos.set(key, { comidas: [], nombre: comida.TCO_COMIDA });
+                    grupos.get(key).comidas.push(comida);
+                }
+
+                // 5) Construir candidatas con calificación efectiva y tiempo habitual
+                const candidatas = [];
+                for (const grupo of grupos.values()) {
+                    const pks = grupo.comidas.map(c => c.TCO_PK_COMIDA);
+
+                    // Calificación efectiva: promedio de calificaciones del catálogo (dueño + colaboradores)
+                    const calificaciones = grupo.comidas
+                        .map(c => c.TCO_CALIFICACION)
+                        .filter(c => c != null && !isNaN(Number(c)))
+                        .map(Number);
+                    const calificacion = calificaciones.length > 0
+                        ? calificaciones.reduce((a, b) => a + b, 0) / calificaciones.length
+                        : null;
+
+                    // Representante: copia del propietario si existe; si no, la primera
+                    const representante = grupo.comidas.find(c => c.TCO_FK_USUARIO === pkPropietario) || grupo.comidas[0];
+
+                    // Tiempo habitual: declarado en T_TIEMPO_HAS_COMIDA o usado históricamente
+                    const declarados = new Set(
+                        tiemposDeclarados.filter(t => pks.includes(t.TTH_FK_COMIDA)).map(t => t.TTH_FK_TIEMPO)
+                    );
+                    const tiemposUsados = new Map();
+                    for (const u of usosHistoricos.filter(x => pks.includes(x.TTC_FK_COMIDA))) {
+                        tiemposUsados.set(u.TTC_FK_TIMEPO, (tiemposUsados.get(u.TTC_FK_TIMEPO) || 0) + u.veces);
+                    }
+                    const tiempoHabitual = declarados.size > 0 ? [...declarados] : [...tiemposUsados.keys()];
+                    const sinHistorial = declarados.size === 0 && tiemposUsados.size === 0;
+
+                    candidatas.push({
+                        pkComida: representante.TCO_PK_COMIDA,
+                        nombre: grupo.nombre,
+                        calificacion,
+                        usadoPrevio: pks.some(pk => pksUsadasPrevias.has(pk)),
+                        corresponde: tiempoHabitual.includes(Number(pkTiempo)),
+                        sinHistorial,
+                    });
+                }
+
+                // 6) Seleccionar 7 días sin repetir priorizando promedio ≥ 4.5
+                // Orden: no usada la semana anterior → respeta tiempo habitual →
+                // sin historial (fallback) → mejor calificación.
+                const orden = (c) => [
+                    c.usadoPrevio ? 0 : 1,
+                    c.corresponde ? 1 : 0,
+                    c.sinHistorial ? 1 : 0,
+                    c.calificacion == null ? -1 : c.calificacion,
+                ];
+                candidatas.sort((a, b) => {
+                    const oa = orden(a), ob = orden(b);
+                    for (let i = 0; i < oa.length; i++) {
+                        if (oa[i] !== ob[i]) return ob[i] - oa[i];
+                    }
+                    return 0;
+                });
+
+                let seleccion = candidatas.slice(0, 7);
+                const calcularPromedio = (sel) =>
+                    sel.reduce((acc, c) => acc + (c.calificacion == null ? 0 : c.calificacion), 0) / 7;
+
+                // Si el promedio con las reglas estrictas queda por debajo de 4.5,
+                // se reintenta relajando únicamente la exclusión de la semana
+                // anterior (priorizando la calificación) para alcanzar el objetivo.
+                if (calcularPromedio(seleccion) < 4.5) {
+                    const ordenPorCalificacion = (c) => [
+                        c.corresponde ? 1 : 0,
+                        c.sinHistorial ? 1 : 0,
+                        c.calificacion == null ? -1 : c.calificacion,
+                    ];
+                    const relajadas = [...candidatas].sort((a, b) => {
+                        const oa = ordenPorCalificacion(a), ob = ordenPorCalificacion(b);
+                        for (let i = 0; i < oa.length; i++) {
+                            if (oa[i] !== ob[i]) return ob[i] - oa[i];
+                        }
+                        return 0;
+                    }).slice(0, 7);
+                    if (calcularPromedio(relajadas) > calcularPromedio(seleccion)) {
+                        seleccion = relajadas;
+                    }
+                }
+
+                if (seleccion.length < 7) {
+                    return res.status(400).json({ mensaje: "No hay suficientes comidas disponibles para completar la semana (se necesitan 7)", estado: false });
+                }
+
+                // 7) Persistir: reemplazar la semana objetivo y guardar las 7 asignaciones
+                const fechaFin = addDays(fechaInicio, 6);
+                await queryAsync(
+                    `DELETE FROM T_TIEMPO_COMIDA WHERE TTC_FK_TIMEPO = ? AND TTC_DIA >= ? AND TTC_DIA <= ?`,
+                    [pkTiempo, fechaInicio, fechaFin]
+                );
+
+                const data = [];
+                for (let i = 0; i < 7; i++) {
+                    const dia = addDays(fechaInicio, i);
+                    const comida = seleccion[i];
+                    await queryAsync(
+                        `INSERT INTO T_TIEMPO_COMIDA (TTC_FK_TIMEPO, TTC_FK_COMIDA, TTC_DIA) VALUES (?, ?, ?)`,
+                        [pkTiempo, comida.pkComida, dia]
+                    );
+                    data.push({ pkComida: comida.pkComida, dia, calificacion: comida.calificacion });
+                }
+
+                const promedio = calcularPromedio(seleccion);
+
+                res.status(200).json({ mensaje: "Semana generada exitosamente", promedio, data });
+            } catch (error) {
+                console.error("Error al generar semana:", error);
+                res.status(400).json({ mensaje: "Hubo un error en el sistema al generar la semana", estado: false });
+            }
+        })();
+    });
+};
+
 module.exports = controller;
