@@ -1,0 +1,24 @@
+{
+  "name": "BoardFood — Planifica la comida de la semana, juntos y gratis",
+  "short_name": "BoardFood",
+  "description": "App gratis para planificar comidas en grupo: crea tableros, invita a tu familia o equipo y genera el menú de la semana en segundos.",
+  "lang": "es",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#044b2a",
+  "icons": [
+    {
+      "src": "assets/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon_sin_fondo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

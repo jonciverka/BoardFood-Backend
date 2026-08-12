@@ -3,98 +3,420 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BoardFood API - Healthcheck</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background-color: #FAFAFA;
-      color: #1A1A1A;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .card {
-      background: #FFFFFF;
-      border: 1px solid #EAEAEA;
-      border-radius: 24px;
-      padding: 48px 40px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-      max-width: 360px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .logo {
-      width: 110px;
-      height: 110px;
-      object-fit: contain;
-      margin-bottom: 24px;
-      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.06));
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #111827;
-      margin-bottom: 12px;
-      letter-spacing: -0.5px;
-    }
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background-color: #ECFDF5;
-      color: #065F46;
-      border: 1px solid #A7F3D0;
-      padding: 6px 16px;
-      border-radius: 9999px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-top: 8px;
-    }
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background-color: #10B981;
-      border-radius: 50%;
-      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+
+  <!-- SEO -->
+  <title>BoardFood — Planifica la comida de la semana, juntos y gratis</title>
+  <meta name="description" content="BoardFood es la app gratis para planificar comidas en grupo: crea tableros, invita a tu familia o equipo y genera el menú de la semana en segundos.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://boardfood.jonathanag.com/">
+  <meta name="theme-color" content="#044b2a">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="BoardFood">
+  <meta property="og:url" content="https://boardfood.jonathanag.com/">
+  <meta property="og:title" content="BoardFood — Planifica la comida de la semana, juntos y gratis">
+  <meta property="og:description" content="Crea tableros de comida compartidos, invita a quien cocina contigo y genera el menú de la semana en segundos. Gratis para siempre.">
+  <meta property="og:image" content="https://boardfood.jonathanag.com/assets/icon.png">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="BoardFood — Planifica la comida de la semana, juntos y gratis">
+  <meta name="twitter:description" content="Crea tableros de comida compartidos, invita a quien cocina contigo y genera el menú de la semana en segundos. Gratis para siempre.">
+  <meta name="twitter:image" content="https://boardfood.jonathanag.com/assets/icon.png">
+
+  <!-- PWA + favicon -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Preload de fuentes críticas (headings, WOFF2) -->
+  <link rel="preload" href="fonts/Quera.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/poppins_bold.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Preload del LCP (captura del hero) -->
+  <link rel="preload" href="assets/mockups/hero_menu.webp" as="image" fetchpriority="high">
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "BoardFood",
+        "url": "https://boardfood.jonathanag.com/",
+        "description": "App gratis para planificar comidas en grupo: crea tableros, invita a tu familia o equipo y genera el menú de la semana en segundos.",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "iOS, Android",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "Organization",
+        "name": "BoardFood",
+        "url": "https://boardfood.jonathanag.com/",
+        "logo": "https://boardfood.jonathanag.com/assets/icon.png"
       }
-      70% {
-        transform: scale(1);
-        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
-      }
-      100% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-      }
-    }
-  </style>
+    ]
+  }
+  </script>
 </head>
 <body>
-  <div class="card">
-    <img src="/logo.png" alt="BoardFood Logo" class="logo">
-    <h1>BoardFood API</h1>
-    <div class="status-badge">
-      <span class="status-dot"></span>
-      System Operational
+
+  <!-- ================= HEADER ================= -->
+  <header class="site-header">
+    <div class="container nav">
+      <a href="#hero" class="nav__brand" aria-label="BoardFood — inicio">
+        <img src="assets/logo-nav.png" alt="" width="36" height="36">
+        BoardFood
+      </a>
+
+      <nav class="nav__links" aria-label="Navegación principal">
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#features">Features</a>
+        <a href="#demo">Demo</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <a href="#cta-final" class="btn btn--primary nav__cta">Descargar gratis</a>
+
+      <button class="nav__toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
+  </header>
+
+  <!-- Menú móvil -->
+  <div id="mobile-menu" class="mobile-menu">
+    <a href="#como-funciona">Cómo funciona</a>
+    <a href="#features">Features</a>
+    <a href="#demo">Demo</a>
+    <a href="#faq">FAQ</a>
+    <a href="#cta-final" class="btn btn--primary">Descargar gratis</a>
   </div>
+
+  <main>
+
+    <!-- ================= HERO ================= -->
+    <section id="hero" class="hero section">
+      <div class="container hero__grid">
+        <div class="hero__content">
+          <span class="hero__badge">100% gratis · Sin suscripciones · Sin pagos ocultos</span>
+          <h1>Planifica la comida de la semana, <em>juntos</em>.</h1>
+          <p class="hero__sub">
+            Crea tableros de comida compartidos, invita a quien cocina contigo y genera el
+            menú de toda la semana en segundos. <strong>Gratis para siempre.</strong>
+          </p>
+          <div class="hero__actions">
+            <a href="#" class="btn btn--primary" data-store="appstore">Descargar gratis</a>
+            <a href="#como-funciona" class="btn btn--ghost">Ver cómo funciona ↓</a>
+          </div>
+          <div class="hero__stores">
+            <a href="#" class="store-badge" data-store="appstore" aria-label="Descargar en App Store">
+              <svg class="store-icon" viewBox="0 0 384 512" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+              <span class="store-label">Descargar en<strong>App Store</strong></span>
+            </a>
+            <a href="#" class="store-badge" data-store="googleplay" aria-label="Descargar en Google Play">
+              <svg class="store-icon" viewBox="0 0 512 512" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
+              <span class="store-label">Descargar en<strong>Google Play</strong></span>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero__visual">
+          <figure class="phone-frame">
+            <img src="assets/mockups/hero_menu.webp"
+                 alt="Captura de BoardFood: el tablero con el menú de la semana asignado día a día"
+                 width="800" height="1739" loading="eager" fetchpriority="high" decoding="async">
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CÓMO FUNCIONA ================= -->
+    <section id="como-funciona" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker">Así de simple</span>
+          <h2>Tu semana organizada en tres pasos</h2>
+          <p>Sin curvas de aprendizaje: crea, invita y deja que BoardFood haga el resto.</p>
+        </div>
+        <div class="steps">
+          <article class="step reveal">
+            <div class="step__media">
+              <figure class="phone-frame phone-frame--mini">
+                <img src="assets/mockups/paso_crear.webp"
+                     alt="Pantalla de BoardFood para crear un tablero de comidas"
+                     width="800" height="1739" loading="lazy">
+              </figure>
+            </div>
+            <span class="step__num">01</span>
+            <h3>Crea tus tableros</h3>
+            <p>Organiza tus comidas en tableros: desayuno, comida, cena o lo que tu grupo necesite.</p>
+          </article>
+          <article class="step reveal">
+            <div class="step__media">
+              <figure class="phone-frame phone-frame--mini">
+                <img src="assets/mockups/paso_invitar.webp"
+                     alt="Pantalla de invitación de BoardFood con código QR para unirse al tablero"
+                     width="800" height="1739" loading="lazy">
+              </figure>
+            </div>
+            <span class="step__num">02</span>
+            <h3>Invita a tu gente</h3>
+            <p>Comparte el tablero con tu familia, roomies o equipo. Únete por invitación o escaneando un QR.</p>
+          </article>
+          <article class="step reveal">
+            <div class="step__media">
+              <figure class="phone-frame phone-frame--mini">
+                <img src="assets/mockups/paso_planificar.webp"
+                     alt="Pantalla de BoardFood con el menú semanal generado automáticamente"
+                     width="800" height="1739" loading="lazy">
+              </figure>
+            </div>
+            <span class="step__num">03</span>
+            <h3>Planifica la semana</h3>
+            <p>Asigna comidas a cada día o deja que BoardFood genere el menú automáticamente.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FEATURES ================= -->
+    <section id="features" class="section features">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker">Todo en un solo lugar</span>
+          <h2>Diseñado para grupos que comen juntos</h2>
+          <p>Nada de cadenas de WhatsApp ni notas sueltas. Todo sincronizado al instante.</p>
+        </div>
+        <div class="features-layout">
+          <div class="features-grid">
+            <article class="feature reveal">
+              <span class="feature__icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              </span>
+              <h3>Catálogo de comidas con fotos</h3>
+              <p>Guarda tus recetas con su foto y compártelas con tu grupo.</p>
+            </article>
+            <article class="feature reveal">
+              <span class="feature__icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+              </span>
+              <h3>Tableros compartidos</h3>
+              <p>Cambia una comida y todos la ven al instante. Sin cadenas de WhatsApp.</p>
+            </article>
+            <article class="feature reveal">
+              <span class="feature__icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z"/><path d="M15 15h2v2h-2zM19 15h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z"/></svg>
+              </span>
+              <h3>Invitaciones y QR</h3>
+              <p>Invita por correo o deja que escaneen tu QR para unirse en un segundo.</p>
+            </article>
+            <article class="feature reveal">
+              <span class="feature__icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 9h18"/></svg>
+              </span>
+              <h3>Menú semanal automático</h3>
+              <p>BoardFood genera la semana por ti a partir de tu catálogo. Tú solo apruebas.</p>
+            </article>
+          </div>
+          <figure class="features-media reveal">
+            <div class="phone-frame">
+              <img src="assets/mockups/feature_catalogo.webp"
+                   alt="Catálogo de comidas de BoardFood con la foto de cada receta"
+                   width="800" height="1739" loading="lazy">
+            </div>
+            <figcaption>Tu catálogo con fotos, compartido con todo el grupo.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DEMO GENERADOR ================= -->
+    <section id="demo" class="section demo">
+      <div class="container demo__wrap">
+        <div class="demo__intro reveal">
+          <span class="kicker">Pruébalo ahora</span>
+          <h2>Genera tu semana en segundos</h2>
+          <p>Elige cuántos días y deja que BoardFood arme un menú de ejemplo. Sin registrarte.</p>
+          <div class="demo__controls">
+            <div class="demo__field">
+              <label for="demo-days">Días de la semana</label>
+              <select id="demo-days">
+                <option value="3">3 días</option>
+                <option value="5">5 días</option>
+                <option value="7" selected>7 días</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn--primary" id="demo-generate">Generar mi semana de ejemplo</button>
+          </div>
+        </div>
+        <div class="demo__result is-empty reveal" id="demo-result" aria-live="polite">
+          <span class="demo__emoji" aria-hidden="true">🥗</span>
+          <p>Pulsa el botón para ver cómo BoardFood arma el menú de ejemplo al instante.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= GRATIS (trust) ================= -->
+    <section id="gratis" class="section gratis">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker">Gratis de verdad</span>
+          <h2>Todo incluido. Sin pagar nunca.</h2>
+          <p>BoardFood es 100% gratis. Sin suscripciones, sin compras dentro de la app, sin sorpresas. Crea, invita y planifica sin límites.</p>
+        </div>
+        <ul class="gratis-list reveal">
+          <li><span class="check">✓</span> Tableros ilimitados</li>
+          <li><span class="check">✓</span> Colaboradores ilimitados</li>
+          <li><span class="check">✓</span> Catálogo completo con fotos</li>
+          <li><span class="check">✓</span> Generador de menú semanal</li>
+          <li><span class="check">✓</span> Invitaciones y escaneo QR</li>
+        </ul>
+        <a href="#" class="btn btn--white reveal" data-store="appstore">Descargar gratis</a>
+      </div>
+    </section>
+
+    <!-- ================= TESTIMONIOS ================= -->
+    <section id="testimonios" class="section testimonios">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker">Ellos ya cocinan en paz</span>
+          <h2>Historias de grupos que dejaron de improvisar</h2>
+        </div>
+        <div class="testimonios-grid">
+          <article class="testimonio reveal">
+            <blockquote>Antes la cena era una pelea diaria. Ahora el tablero lo decide por nosotros. Mi pareja y yo por fin cocinamos en paz.</blockquote>
+          </article>
+          <article class="testimonio reveal">
+            <blockquote>Comparto tablero con mis roomies y el menú de la semana se arma solo. Ya nadie pregunta qué hay de cenar.</blockquote>
+          </article>
+          <article class="testimonio reveal">
+            <blockquote>El generador de semana me salva. Comemos más variado y gastamos menos.</blockquote>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FAQ ================= -->
+    <section id="faq" class="section faq">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker">Preguntas frecuentes</span>
+          <h2>Resolvemos tus dudas antes de que las tengas</h2>
+        </div>
+        <div class="faq-list reveal">
+          <div class="faq-item">
+            <button class="faq-item__q" aria-expanded="false">
+              ¿Es gratis de verdad?
+              <span class="faq-item__icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-item__a"><p>Sí. BoardFood es 100% gratis, sin suscripciones ni pagos ocultos.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-item__q" aria-expanded="false">
+              ¿Necesito cuenta?
+              <span class="faq-item__icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-item__a"><p>Sí, el registro es gratuito y toma menos de un minuto. También puedes entrar con tu cuenta de Google.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-item__q" aria-expanded="false">
+              ¿Puedo usarlo con mi familia?
+              <span class="faq-item__icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-item__a"><p>Sí, es su uso natural: crea un tablero e invita a los miembros de tu familia.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-item__q" aria-expanded="false">
+              ¿Cómo invito a alguien a un tablero?
+              <span class="faq-item__icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-item__a"><p>Por invitación directa o compartiendo un código QR. La persona escanea y se une al instante.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-item__q" aria-expanded="false">
+              ¿El menú se genera automáticamente?
+              <span class="faq-item__icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-item__a"><p>Sí. El generador usa tu catálogo de comidas. Puedes editar cualquier día después.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CTA FINAL ================= -->
+    <section id="cta-final" class="section cta-final">
+      <div class="container reveal">
+        <h2>Deja de improvisar la cena</h2>
+        <p>Descárgalo gratis y planifica tu primera semana en minutos.</p>
+        <a href="#" class="btn btn--white" data-store="appstore">Descargar BoardFood gratis</a>
+        <p class="cta-note">Gratis para siempre. Disponible en iOS y Android.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="assets/logo-nav.png" alt="BoardFood" width="40" height="40">
+          <p>Planifica la comida de la semana, juntos y gratis.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Producto</h4>
+          <ul>
+            <li><a href="#como-funciona">Cómo funciona</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#" rel="nofollow">Soporte</a></li>
+            <li><a href="#" rel="nofollow">Privacidad</a></li>
+            <li><a href="#" rel="nofollow">Términos</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-mini-cta">
+          <div class="stores-inline">
+            <a href="#" class="store-badge" data-store="appstore" aria-label="Descargar en App Store">
+              <svg class="store-icon" viewBox="0 0 384 512" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+              <span class="store-label">Descargar en<strong>App Store</strong></span>
+            </a>
+            <a href="#" class="store-badge" data-store="googleplay" aria-label="Descargar en Google Play">
+              <svg class="store-icon" viewBox="0 0 512 512" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
+              <span class="store-label">Descargar en<strong>Google Play</strong></span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>BoardFood · © <span id="year">2026</span> · Todos los derechos reservados</span>
+        <div class="footer-social">
+          <a href="#" rel="nofollow" aria-label="Instagram">Instagram</a>
+          <a href="#" rel="nofollow" aria-label="Facebook">Facebook</a>
+          <a href="#" rel="nofollow" aria-label="X (Twitter)">X/Twitter</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
